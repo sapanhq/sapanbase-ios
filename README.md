@@ -19,7 +19,7 @@ https://github.com/HelpBento/helpbento-ios
 Or add it to your `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/HelpBento/helpbento-ios", from: "1.0.0")
+.package(url: "https://github.com/HelpBento/helpbento-ios", from: "0.1.0")
 ```
 
 ## Quick start
