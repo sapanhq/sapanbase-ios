@@ -13,13 +13,13 @@ required.
 In Xcode: **File → Add Package Dependencies…** and enter:
 
 ```
-https://github.com/HelpBento/helpbento-ios
+https://github.com/BentoSoftware/helpbento-ios
 ```
 
 Or add it to your `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/HelpBento/helpbento-ios", from: "0.1.0")
+.package(url: "https://github.com/BentoSoftware/helpbento-ios", from: "0.1.0")
 ```
 
 ## Quick start
