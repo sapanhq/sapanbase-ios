@@ -88,6 +88,15 @@ extension AppDelegate: HelpBentoDelegate {
 Every method has an empty default implementation, so implement only what you
 need.
 
+## Your own support form
+
+To send a native in-app support form (e.g. title, reason dropdown, details)
+to the HelpBento inbox, post it from **your backend** to
+`POST /v1/support-requests` with an API key, passing the signed-in user's
+`userId` and your form answers as `customFields`. The request shows in the
+inbox tied to the verified user. There's no SDK method for this: the API key
+must stay on your server, never in the app.
+
 ## Domain allowlist
 
 If your workspace restricts the widget to specific domains (Settings >
