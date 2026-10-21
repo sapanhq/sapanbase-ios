@@ -87,9 +87,10 @@ public final class HelpBento: NSObject {
     ///   - userId: Unique identifier for the user.
     ///   - email: The user's email address.
     ///   - name: The user's display name.
-    ///   - hmac: HMAC-SHA256 signature generated on your server over
-    ///     `"<userId>:<email>"` (or `userId` alone with no email supplied).
-    ///     Required for the user to show as verified on support requests.
+    ///   - hmac: The `v1.`-prefixed HMAC-SHA256 signature your server generates
+    ///     over `"<userId>\n<email>"` (empty email after the newline when none
+    ///     is supplied) — see the HelpBento widget integration guide. Passed
+    ///     through as-is. Required for the user to show as verified.
     public func identify(userId: String, email: String? = nil, name: String? = nil, hmac: String? = nil) {
         runOnMain { [self] in
             guard chatViewController != nil else {
