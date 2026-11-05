@@ -1,8 +1,8 @@
-# HelpBentoSDK (iOS)
+# SapanBaseSDK (iOS)
 
-HelpBento AI chat widget for native iOS apps.
+SapanBase AI chat widget for native iOS apps.
 
-This package renders **no native chat UI**. `HelpBento.shared.open(from:)`
+This package renders **no native chat UI**. `SapanBase.shared.open(from:)`
 presents a `WKWebView` that loads the same `widget.js` powering the
 JavaScript SDK, and drives it through a small JS bridge. One UI source of
 truth: widget fixes and new features ship server-side, with no SDK update
@@ -13,13 +13,13 @@ required.
 In Xcode: **File → Add Package Dependencies…** and enter:
 
 ```
-https://github.com/BentoSoftware/helpbento-ios
+https://github.com/sapanhq/sapanbase-ios
 ```
 
 Or add it to your `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/BentoSoftware/helpbento-ios", from: "0.1.0")
+.package(url: "https://github.com/sapanhq/sapanbase-ios", from: "0.2.0")
 ```
 
 ## Quick start
@@ -27,17 +27,17 @@ Or add it to your `Package.swift`:
 Initialize once, early — e.g. in `AppDelegate` or your `SceneDelegate`:
 
 ```swift
-import HelpBentoSDK
+import SapanBaseSDK
 
-HelpBento.shared.delegate = self
-HelpBento.shared.initialize(companyId: "YOUR_COMPANY_ID")
+SapanBase.shared.delegate = self
+SapanBase.shared.initialize(companyId: "YOUR_COMPANY_ID")
 ```
 
 Identify the user after login, with an HMAC signature generated on **your**
-server (see the HelpBento widget integration guide for the signing recipe):
+server (see the SapanBase widget integration guide for the signing recipe):
 
 ```swift
-HelpBento.shared.identify(
+SapanBase.shared.identify(
     userId: user.id,
     email: user.email,
     name: user.displayName,
@@ -49,14 +49,14 @@ Open the chat from a Help button:
 
 ```swift
 @IBAction func helpButtonTapped(_ sender: Any) {
-    HelpBento.shared.open() // or open(from: self) to present from a specific VC
+    SapanBase.shared.open() // or open(from: self) to present from a specific VC
 }
 ```
 
 On logout:
 
 ```swift
-HelpBento.shared.clearUser()
+SapanBase.shared.clearUser()
 ```
 
 ## API
@@ -70,18 +70,18 @@ HelpBento.shared.clearUser()
 | `close()` | Dismiss the chat panel. |
 | `destroy()` | Tear down the widget; `initialize()` may be called again. |
 | `isOpen` | Whether the chat panel is currently open. |
-| `delegate` | A `HelpBentoDelegate` for lifecycle and message events. |
+| `delegate` | A `SapanBaseDelegate` for lifecycle and message events. |
 
 All methods are safe to call from any thread.
 
 ## Delegate
 
 ```swift
-extension AppDelegate: HelpBentoDelegate {
-    func helpBentoDidOpen() { }
-    func helpBentoDidClose() { }
-    func helpBentoDidReceiveMessage(content: String) { }
-    func helpBentoDidFailWithError(message: String) { }
+extension AppDelegate: SapanBaseDelegate {
+    func sapanBaseDidOpen() { }
+    func sapanBaseDidClose() { }
+    func sapanBaseDidReceiveMessage(content: String) { }
+    func sapanBaseDidFailWithError(message: String) { }
 }
 ```
 
@@ -91,7 +91,7 @@ need.
 ## Your own support form
 
 To send a native in-app support form (e.g. title, reason dropdown, details)
-to the HelpBento inbox, post it from **your backend** to
+to the SapanBase inbox, post it from **your backend** to
 `POST /v1/support-requests` with an API key, passing the signed-in user's
 `userId` and your form answers as `customFields`. The request shows in the
 inbox tied to the verified user. There's no SDK method for this: the API key

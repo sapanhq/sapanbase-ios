@@ -2,20 +2,20 @@
 import PackageDescription
 
 let package = Package(
-    name: "HelpBentoSDK",
+    name: "SapanBaseSDK",
     platforms: [
         .iOS(.v14)
     ],
     products: [
         .library(
-            name: "HelpBentoSDK",
-            targets: ["HelpBentoSDK"]
+            name: "SapanBaseSDK",
+            targets: ["SapanBaseSDK"]
         )
     ],
     targets: [
         .target(
-            name: "HelpBentoSDK",
-            path: "Sources/HelpBentoSDK"
+            name: "SapanBaseSDK",
+            path: "Sources/SapanBaseSDK"
         )
     ]
 )

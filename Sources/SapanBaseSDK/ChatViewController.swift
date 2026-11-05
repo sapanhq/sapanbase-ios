@@ -1,9 +1,9 @@
 import UIKit
 import WebKit
 
-/// Presents the HelpBento web chat widget in a `WKWebView` and bridges its
+/// Presents the SapanBase web chat widget in a `WKWebView` and bridges its
 /// JavaScript events back to native closures. Internal only — hosts interact
-/// with the widget exclusively through `HelpBento`, never this type.
+/// with the widget exclusively through `SapanBase`, never this type.
 ///
 /// The controller renders no native chat UI of its own: it loads a small
 /// generated HTML page that pulls in the production `widget.js` and drives it
@@ -12,7 +12,7 @@ final class ChatViewController: UIViewController {
 
     /// The JS bridge's message handler name, referenced by both the native
     /// `WKUserContentController` registration and the generated page script.
-    static let bridgeHandlerName = "helpbento"
+    static let bridgeHandlerName = "sapanbase"
 
     /// Fired once the widget reports `'ready'` (its DOM exists; `open()` and
     /// `identify()` are safe to call in JS from this point on).
@@ -37,7 +37,7 @@ final class ChatViewController: UIViewController {
 
     /// Designated initializer.
     /// - Parameters:
-    ///   - companyId: The HelpBento company ID passed to `widget.js`'s `init`.
+    ///   - companyId: The SapanBase company ID passed to `widget.js`'s `init`.
     ///   - agentId: Optional agent ID passed to `widget.js`'s `init`.
     ///   - scriptURL: Where to load `widget.js` from.
     init(companyId: String, agentId: String?, scriptURL: URL) {
@@ -151,16 +151,16 @@ final class ChatViewController: UIViewController {
             } catch (e) { /* bridge unavailable; nothing to do */ }
           }
           function wireAndInit() {
-            if (!window.HelpBento) {
+            if (!window.SapanBase) {
               setTimeout(wireAndInit, 30);
               return;
             }
-            window.HelpBento.on('ready', function () { post('ready'); });
-            window.HelpBento.on('open', function () { post('open'); });
-            window.HelpBento.on('close', function () { post('close'); });
-            window.HelpBento.on('message', function (payload) { post('message', payload); });
-            window.HelpBento.on('error', function (payload) { post('error', payload); });
-            window.HelpBento.init(\(configJSON));
+            window.SapanBase.on('ready', function () { post('ready'); });
+            window.SapanBase.on('open', function () { post('open'); });
+            window.SapanBase.on('close', function () { post('close'); });
+            window.SapanBase.on('message', function (payload) { post('message', payload); });
+            window.SapanBase.on('error', function (payload) { post('error', payload); });
+            window.SapanBase.init(\(configJSON));
           }
           wireAndInit();
         })();
@@ -189,7 +189,7 @@ final class ChatViewController: UIViewController {
     /// Serialize `object` to a JSON string safe to inline into a `<script>`
     /// block. Escapes U+2028/U+2029, which are legal in JSON strings but are
     /// JavaScript line terminators, so an unescaped one would be a syntax
-    /// error rather than data. Shared with `HelpBento` for bridge calls
+    /// error rather than data. Shared with `SapanBase` for bridge calls
     /// (`identify`) made after the page has already loaded.
     static func jsonString(from object: Any) -> String {
         guard let data = try? JSONSerialization.data(withJSONObject: object, options: []),

@@ -1,35 +1,35 @@
 import UIKit
 
-/// Entry point for the HelpBento iOS SDK.
+/// Entry point for the SapanBase iOS SDK.
 ///
-/// `HelpBento` is a thin `WKWebView` shell around the hosted HelpBento chat
+/// `SapanBase` is a thin `WKWebView` shell around the hosted SapanBase chat
 /// widget: it renders no native chat UI of its own. Widget fixes and new
 /// features ship server-side, with no SDK update required.
 ///
 /// ```swift
-/// HelpBento.shared.delegate = self
-/// HelpBento.shared.initialize(companyId: "YOUR_COMPANY_ID")
+/// SapanBase.shared.delegate = self
+/// SapanBase.shared.initialize(companyId: "YOUR_COMPANY_ID")
 /// // ...later, e.g. from a Help button:
-/// HelpBento.shared.open()
+/// SapanBase.shared.open()
 /// ```
 ///
 /// Every method is safe to call from any thread; work is hopped to the main
 /// thread internally.
-public final class HelpBento: NSObject {
+public final class SapanBase: NSObject {
 
-    /// The shared SDK instance. HelpBento supports a single chat session per
+    /// The shared SDK instance. SapanBase supports a single chat session per
     /// app process.
-    public static let shared = HelpBento()
+    public static let shared = SapanBase()
 
     /// Receives widget lifecycle and message events. Held weakly.
-    public weak var delegate: HelpBentoDelegate?
+    public weak var delegate: SapanBaseDelegate?
 
     /// Whether the chat panel is currently open. Tracks native presentation
     /// state, updated from the widget's own open/close events and from an
     /// interactive swipe-to-dismiss.
     public private(set) var isOpen: Bool = false
 
-    private static let defaultScriptURL = URL(string: "https://app.helpbento.com/widget.js")!
+    private static let defaultScriptURL = URL(string: "https://app.sapanbase.com/widget.js")!
 
     private var chatViewController: ChatViewController?
     private var isReady = false
@@ -53,11 +53,11 @@ public final class HelpBento: NSObject {
     /// user switch.
     ///
     /// - Parameters:
-    ///   - companyId: Your HelpBento company ID (Settings > Widget Embed).
+    ///   - companyId: Your SapanBase company ID (Settings > Widget Embed).
     ///   - agentId: Target a specific support agent. Defaults to the
     ///     company's default agent.
     ///   - scriptURL: Where to load `widget.js` from. Defaults to
-    ///     `https://app.helpbento.com/widget.js`. Override only for local
+    ///     `https://app.sapanbase.com/widget.js`. Override only for local
     ///     development against the Firebase emulators — `widget.js` derives
     ///     its API base URL from this script's origin, so it must be a real
     ///     `http(s)` URL, never a file bundled into the app.
@@ -89,12 +89,12 @@ public final class HelpBento: NSObject {
     ///   - name: The user's display name.
     ///   - hmac: The `v1.`-prefixed HMAC-SHA256 signature your server generates
     ///     over `"<userId>\n<email>"` (empty email after the newline when none
-    ///     is supplied) — see the HelpBento widget integration guide. Passed
+    ///     is supplied) — see the SapanBase widget integration guide. Passed
     ///     through as-is. Required for the user to show as verified.
     public func identify(userId: String, email: String? = nil, name: String? = nil, hmac: String? = nil) {
         runOnMain { [self] in
             guard chatViewController != nil else {
-                assertionFailure("HelpBento: call initialize() before identify()")
+                assertionFailure("SapanBase: call initialize() before identify()")
                 return
             }
             let pending = PendingIdentity.identify(userId: userId, email: email, name: name, hmac: hmac)
@@ -126,18 +126,18 @@ public final class HelpBento: NSObject {
     public func open(from presenter: UIViewController? = nil) {
         runOnMain { [self] in
             guard let controller = chatViewController else {
-                assertionFailure("HelpBento: call initialize() before open()")
+                assertionFailure("SapanBase: call initialize() before open()")
                 return
             }
             if controller.presentingViewController == nil {
                 guard let host = presenter ?? Self.topViewController() else {
-                    assertionFailure("HelpBento: no view controller available to present from")
+                    assertionFailure("SapanBase: no view controller available to present from")
                     return
                 }
                 host.present(controller, animated: true)
             }
             if isReady {
-                controller.evaluateJS("window.HelpBento && window.HelpBento.open();")
+                controller.evaluateJS("window.SapanBase && window.SapanBase.open();")
             } else {
                 pendingOpenRequested = true
             }
@@ -148,7 +148,7 @@ public final class HelpBento: NSObject {
     public func close() {
         runOnMain { [self] in
             pendingOpenRequested = false
-            chatViewController?.evaluateJS("window.HelpBento && window.HelpBento.close();")
+            chatViewController?.evaluateJS("window.SapanBase && window.SapanBase.close();")
             finishClose()
         }
     }
@@ -177,7 +177,7 @@ public final class HelpBento: NSObject {
             self?.finishClose()
         }
         controller.onLoadFailure = { [weak self] message in
-            self?.delegate?.helpBentoDidFailWithError(message: message)
+            self?.delegate?.sapanBaseDidFailWithError(message: message)
         }
     }
 
@@ -188,7 +188,7 @@ public final class HelpBento: NSObject {
             pendingIdentity = nil
         }
         if pendingOpenRequested {
-            controller.evaluateJS("window.HelpBento && window.HelpBento.open();")
+            controller.evaluateJS("window.SapanBase && window.SapanBase.open();")
             pendingOpenRequested = false
         }
     }
@@ -200,9 +200,9 @@ public final class HelpBento: NSObject {
             if let email { user["email"] = email }
             if let name { user["name"] = name }
             if let hmac { user["hmac"] = hmac }
-            chatViewController?.evaluateJS("window.HelpBento && window.HelpBento.identify(\(ChatViewController.jsonString(from: user)));")
+            chatViewController?.evaluateJS("window.SapanBase && window.SapanBase.identify(\(ChatViewController.jsonString(from: user)));")
         case .clear:
-            chatViewController?.evaluateJS("window.HelpBento && window.HelpBento.clearUser();")
+            chatViewController?.evaluateJS("window.SapanBase && window.SapanBase.clearUser();")
         }
     }
 
@@ -210,13 +210,13 @@ public final class HelpBento: NSObject {
         switch event {
         case "open":
             isOpen = true
-            delegate?.helpBentoDidOpen()
+            delegate?.sapanBaseDidOpen()
         case "close":
             finishClose()
         case "message":
-            delegate?.helpBentoDidReceiveMessage(content: (payload?["content"] as? String) ?? "")
+            delegate?.sapanBaseDidReceiveMessage(content: (payload?["content"] as? String) ?? "")
         case "error":
-            delegate?.helpBentoDidFailWithError(message: (payload?["message"] as? String) ?? "Unknown widget error")
+            delegate?.sapanBaseDidFailWithError(message: (payload?["message"] as? String) ?? "Unknown widget error")
         default:
             break
         }
@@ -235,13 +235,13 @@ public final class HelpBento: NSObject {
             controller.dismiss(animated: true)
         }
         if wasOpen {
-            delegate?.helpBentoDidClose()
+            delegate?.sapanBaseDidClose()
         }
     }
 
     private func teardown() {
         if let controller = chatViewController {
-            controller.evaluateJS("window.HelpBento && window.HelpBento.destroy();")
+            controller.evaluateJS("window.SapanBase && window.SapanBase.destroy();")
             if controller.presentingViewController != nil {
                 controller.dismiss(animated: false)
             }
